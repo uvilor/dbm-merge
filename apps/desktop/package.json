@@ -3,12 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "description": "Electron + React desktop app for SchemaSync",
-  "main": "dist/main/index.cjs",
+  "author": "Erinell Barba <erinell.barba@gmail.com>",
+  "main": "dist/main/index.js",
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux",
     "lint": "eslint src --ext .ts,.tsx",
     "typecheck": "tsc --noEmit"
   },

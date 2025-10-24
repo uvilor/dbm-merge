@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@9.12.2",
+  "author": "Erinell Barba <erinell.barba@gmail.com>",
   "type": "module",
   "workspaces": [
     "packages/*",
@@ -12,6 +13,10 @@
     "build": "pnpm -r run build",
     "dev": "pnpm --filter @schemasync/desktop dev",
     "dev:desktop": "pnpm --filter @schemasync/desktop dev",
+    "dist": "pnpm --filter @schemasync/desktop dist",
+    "dist:win": "pnpm --filter @schemasync/desktop dist:win",
+    "dist:mac": "pnpm --filter @schemasync/desktop dist:mac",
+    "dist:linux": "pnpm --filter @schemasync/desktop dist:linux",
     "test": "pnpm -r run test",
     "lint": "eslint .",
     "format": "prettier --write .",

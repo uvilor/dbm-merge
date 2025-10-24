@@ -57,24 +57,39 @@ const INITIAL_STATE: AppState = {
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(INITIAL_STATE);
+  const [debugInfo, setDebugInfo] = useState<string>('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    window.schemasync
-      .listConnections()
-      .then((data) => {
-        setState((prev) => ({
-          ...prev,
-          connections: {
-            source: data.connections.source ?? { ...DEFAULT_CONNECTION },
-            target: data.connections.target ?? { ...DEFAULT_CONNECTION, kind: 'mariadb', port: 3306 },
-          },
-          preferences: data.preferences ?? { ...DEFAULT_PREFERENCES },
-        }));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const debug = [
+      'App useEffect running...',
+      `window.schemasync available: ${!!window.schemasync}`,
+      `window object keys: ${Object.keys(window).join(', ')}`,
+    ].join('\n');
+    setDebugInfo(debug);
+    console.log(debug);
+    
+    if (window.schemasync) {
+      console.log('Calling listConnections...');
+      window.schemasync
+        .listConnections()
+        .then((data) => {
+          console.log('Connections loaded:', data);
+          setState((prev) => ({
+            ...prev,
+            connections: {
+              source: data.connections.source ?? { ...DEFAULT_CONNECTION },
+              target: data.connections.target ?? { ...DEFAULT_CONNECTION, kind: 'mariadb', port: 3306 },
+            },
+            preferences: data.preferences ?? { ...DEFAULT_PREFERENCES },
+          }));
+        })
+        .catch((error) => {
+          console.error('Error loading connections:', error);
+        });
+    } else {
+      console.warn('window.schemasync not available, using default state');
+    }
   }, []);
 
   const updateConnection = useCallback(
@@ -98,10 +113,18 @@ const App: React.FC = () => {
   }, []);
 
   const handleSaveConnections = useCallback(async () => {
-    await window.schemasync.saveConnections({ connections: state.connections });
+    if (window.schemasync) {
+      await window.schemasync.saveConnections({ connections: state.connections });
+    } else {
+      console.warn('window.schemasync not available, cannot save connections');
+    }
   }, [state.connections]);
 
   const handleTestConnection = useCallback(async (side: 'source' | 'target') => {
+    if (!window.schemasync) {
+      setLoading(false, 'API not available');
+      return;
+    }
     try {
       setLoading(true);
       await window.schemasync.testConnection(state.connections[side]);
@@ -228,39 +251,45 @@ const App: React.FC = () => {
   );
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <ConnectionsPage
-            state={state}
-            onUpdateConnection={updateConnection}
-            onSave={handleSaveConnections}
-            onTest={handleTestConnection}
-          />
-        }
-      />
-      <Route
-        path="/compare"
-        element={<ComparePage state={state} onCompare={handleCompare} onPreferencesChange={handlePreferencesChange} />}
-      />
-      <Route
-        path="/results"
-        element={
-          <ResultsPage
-            context={context}
-          />
-        }
-      />
-      <Route
-        path="/review"
-        element={
-          <ScriptReviewPage
-            context={context}
-          />
-        }
-      />
-    </Routes>
+    <div>
+      <div style={{ background: '#1e293b', padding: '10px', margin: '10px', borderRadius: '5px', color: 'white', fontSize: '12px' }}>
+        <h3>Debug Info:</h3>
+        <pre style={{ whiteSpace: 'pre-wrap' }}>{debugInfo}</pre>
+      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ConnectionsPage
+              state={state}
+              onUpdateConnection={updateConnection}
+              onSave={handleSaveConnections}
+              onTest={handleTestConnection}
+            />
+          }
+        />
+        <Route
+          path="/compare"
+          element={<ComparePage state={state} onCompare={handleCompare} onPreferencesChange={handlePreferencesChange} />}
+        />
+        <Route
+          path="/results"
+          element={
+            <ResultsPage
+              context={context}
+            />
+          }
+        />
+        <Route
+          path="/review"
+          element={
+            <ScriptReviewPage
+              context={context}
+            />
+          }
+        />
+      </Routes>
+    </div>
   );
 };
 

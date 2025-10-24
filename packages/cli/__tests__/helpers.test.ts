@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { describe, expect, it } from 'vitest';
 
-import { parseConnection, renderDiffSummary, summarizeDiff } from '../src/index';
+import { parseConnection, renderDiffSummary, summarizeDiff } from '../src/utils';
 
 chalk.level = 0;
 

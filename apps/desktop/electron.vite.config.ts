@@ -36,5 +36,9 @@ export default defineConfig({
         '@': resolve(__dirname, 'src/renderer'),
       },
     },
+    server: {
+      port: 5173,
+      host: 'localhost',
+    },
   },
 });

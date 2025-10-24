@@ -17,6 +17,8 @@ import {
   type SchemaRef,
 } from '@schemasync/core';
 
+import { parseConnection, renderDiffSummary, summarizeDiff } from './utils';
+
 const program = new Command();
 
 program
@@ -156,29 +158,6 @@ program.parseAsync().catch((error) => {
   process.exit(1);
 });
 
-function parseConnection(value: string, defaultSchema?: string): SchemaRef {
-  const url = new URL(value);
-  const kind = url.protocol.replace(':', '');
-  if (kind !== 'postgres' && kind !== 'mariadb') {
-    throw new Error(`Unsupported protocol ${url.protocol}`);
-  }
-
-  const schema = url.searchParams.get('schema') ?? defaultSchema;
-  if (!schema) {
-    throw new Error('Schema must be provided via ?schema= or --schema');
-  }
-
-  return {
-    kind,
-    host: url.hostname,
-    port: Number(url.port || (kind === 'postgres' ? 5432 : 3306)),
-    database: url.pathname.replace(/^\//, ''),
-    schema,
-    user: decodeURIComponent(url.username),
-    password: url.password ? decodeURIComponent(url.password) : undefined,
-    ssl: url.searchParams.get('ssl') === 'true',
-  };
-}
 
 async function loadSchema(ref: SchemaRef): Promise<SchemaModel> {
   return ref.kind === 'postgres' ? loadPostgres(ref) : loadMariaDB(ref);
@@ -194,47 +173,3 @@ async function runWithErrors(fn: () => Promise<void>) {
   }
 }
 
-function summarizeDiff(diff: DiffResult) {
-  return {
-    tables: {
-      added: diff.tables.added.length,
-      removed: diff.tables.removed.length,
-      changed: diff.tables.changed.length,
-    },
-    views: diff.views,
-    routines: diff.routines,
-    triggers: diff.triggers,
-  };
-}
-
-function renderDiffSummary(diff: DiffResult): string {
-  const lines: string[] = [];
-  lines.push(chalk.bold('Tables:'));
-  lines.push(`  Added: ${diff.tables.removed.length}`);
-  lines.push(`  Removed: ${diff.tables.added.length}`);
-  lines.push(`  Changed: ${diff.tables.changed.length}`);
-
-  diff.tables.changed.forEach((change) => {
-    lines.push(`    - ${change.table.name}: +${change.removedColumns.length} columns, -${change.addedColumns.length} columns`);
-  });
-
-  lines.push('');
-  lines.push(chalk.bold('Views:'));
-  lines.push(`  Added: ${diff.views.removed.length}`);
-  lines.push(`  Removed: ${diff.views.added.length}`);
-  lines.push(`  Changed: ${diff.views.changed.length}`);
-
-  lines.push('');
-  lines.push(chalk.bold('Routines:'));
-  lines.push(`  Added: ${diff.routines.removed.length}`);
-  lines.push(`  Removed: ${diff.routines.added.length}`);
-  lines.push(`  Changed: ${diff.routines.changed.length}`);
-
-  lines.push('');
-  lines.push(chalk.bold('Triggers:'));
-  lines.push(`  Added: ${diff.triggers.removed.length}`);
-  lines.push(`  Removed: ${diff.triggers.added.length}`);
-  lines.push(`  Changed: ${diff.triggers.changed.length}`);
-
-  return lines.join('\n');
-}

@@ -4,6 +4,8 @@ import type { DiffResult } from '@schemasync/core';
 
 import type { ConnectionConfig, PreferenceConfig, StoredData } from '../main/store';
 
+console.log('Preload script loading...');
+
 export interface IpcAPI {
   listConnections(): Promise<StoredData>;
   saveConnections(payload: { connections: { source?: ConnectionConfig; target?: ConnectionConfig } }): Promise<{ status: string }>;
@@ -34,7 +36,9 @@ const api: IpcAPI = {
   saveFile: (payload) => ipcRenderer.invoke('schemasync:save-file', payload),
 };
 
+console.log('Exposing schemasync API...');
 contextBridge.exposeInMainWorld('schemasync', api);
+console.log('schemasync API exposed successfully');
 
 declare global {
   interface Window {
