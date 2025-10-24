@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DDL generators > produces mariadb DDL snapshots 1`] = `
+"START TRANSACTION;
+
+ALTER TABLE \`users\` DROP COLUMN \`status\`;
+
+DROP INDEX \`users_status_idx\` ON \`users\`;
+
+COMMIT;"
+`;
+
+exports[`DDL generators > produces postgres DDL snapshots 1`] = `
+"BEGIN;
+
+-- ALTER TABLE "users" DROP COLUMN "status";
+
+-- DROP INDEX "users_status_idx";
+
+COMMIT;"
+`;
