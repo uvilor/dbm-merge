@@ -1,0 +1,13 @@
+{
+  "name": "@schemasync/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "electron ."
+  },
+  "dependencies": {
+    "electron": "^31.3.0"
+  }
+}

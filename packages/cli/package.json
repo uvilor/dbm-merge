@@ -1,0 +1,22 @@
+{
+  "name": "@schemasync/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "schemasync": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "demo": "node dist/index.js --from mariadb://a --to mariadb://b --engine mariadb"
+  },
+  "dependencies": {
+    "@schemasync/core": "0.1.0",
+    "yargs": "^17.7.2",
+    "chalk": "^5.3.0",
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}
