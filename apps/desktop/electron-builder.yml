@@ -1,0 +1,13 @@
+appId: com.schemasync.desktop
+productName: SchemaSync
+files:
+  - dist/main/**
+  - dist/preload/**
+  - dist/renderer/**
+  - package.json
+mac:
+  target: dmg
+win:
+  target: nsis
+linux:
+  target: AppImage

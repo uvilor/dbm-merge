@@ -1,0 +1,185 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`computeDiff > produces a structured diff for tables and indexes 1`] = `
+{
+  "routines": {
+    "added": [],
+    "changed": [],
+    "removed": [],
+  },
+  "tables": {
+    "added": [
+      {
+        "checks": [],
+        "columns": [
+          {
+            "dataType": "bigint",
+            "generated": "sequence",
+            "name": "id",
+            "nullable": false,
+          },
+          {
+            "dataType": "jsonb",
+            "name": "payload",
+            "nullable": true,
+          },
+        ],
+        "fks": [],
+        "indexes": [],
+        "name": "audit_log",
+      },
+    ],
+    "changed": [
+      {
+        "addedChecks": [],
+        "addedColumns": [
+          {
+            "dataType": "timestamp",
+            "default": "CURRENT_TIMESTAMP",
+            "name": "created_at",
+            "nullable": false,
+          },
+        ],
+        "addedForeignKeys": [],
+        "addedIndexes": [
+          {
+            "columns": [
+              "created_at",
+            ],
+            "name": "accounts_created_at_idx",
+            "unique": false,
+          },
+        ],
+        "checkChanges": [],
+        "columnChanges": [],
+        "foreignKeyChanges": [],
+        "indexChanges": [
+          {
+            "change": {
+              "from": {
+                "columns": [
+                  "email",
+                ],
+                "name": "accounts_email_key",
+                "unique": true,
+              },
+              "to": {
+                "columns": [
+                  "email",
+                ],
+                "name": "accounts_email_key",
+                "unique": false,
+              },
+            },
+            "name": "accounts_email_key",
+          },
+        ],
+        "primaryKeyChange": undefined,
+        "removedChecks": [],
+        "removedColumns": [],
+        "removedForeignKeys": [],
+        "removedIndexes": [],
+        "sourceTable": {
+          "checks": [],
+          "columns": [
+            {
+              "dataType": "uuid",
+              "default": "gen_random_uuid()",
+              "generated": "sequence",
+              "name": "id",
+              "nullable": false,
+            },
+            {
+              "dataType": "varchar",
+              "length": 255,
+              "name": "email",
+              "nullable": false,
+            },
+          ],
+          "fks": [],
+          "indexes": [
+            {
+              "columns": [
+                "email",
+              ],
+              "name": "accounts_email_key",
+              "unique": true,
+            },
+          ],
+          "name": "accounts",
+          "primaryKey": {
+            "columns": [
+              "id",
+            ],
+            "name": "accounts_pkey",
+          },
+        },
+        "table": {
+          "checks": [],
+          "columns": [
+            {
+              "dataType": "uuid",
+              "default": "gen_random_uuid()",
+              "generated": "sequence",
+              "name": "id",
+              "nullable": false,
+            },
+            {
+              "dataType": "varchar",
+              "length": 128,
+              "name": "email",
+              "nullable": false,
+            },
+            {
+              "dataType": "timestamp",
+              "default": "CURRENT_TIMESTAMP",
+              "name": "created_at",
+              "nullable": false,
+            },
+          ],
+          "fks": [],
+          "indexes": [
+            {
+              "columns": [
+                "email",
+              ],
+              "name": "accounts_email_key",
+              "unique": false,
+            },
+            {
+              "columns": [
+                "created_at",
+              ],
+              "name": "accounts_created_at_idx",
+              "unique": false,
+            },
+          ],
+          "name": "accounts",
+          "primaryKey": {
+            "columns": [
+              "id",
+            ],
+            "name": "accounts_pkey",
+          },
+        },
+      },
+    ],
+    "removed": [],
+  },
+  "triggers": {
+    "added": [],
+    "changed": [],
+    "removed": [],
+  },
+  "views": {
+    "added": [],
+    "changed": [],
+    "removed": [
+      {
+        "definition": "SELECT * FROM accounts WHERE active = true;",
+        "name": "active_accounts_v",
+      },
+    ],
+  },
+}
+`;

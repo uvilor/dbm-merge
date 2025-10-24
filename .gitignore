@@ -7,3 +7,5 @@ dist
 *.log
 pnpm-lock.yaml
 coverage
+node_modules/
+**/dist/
