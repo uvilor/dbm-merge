@@ -3,14 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "description": "Electron + React desktop app for SchemaSync",
-  "main": "dist/main/index.js",
+  "main": "dist/main/index.cjs",
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "prepackage": "pnpm run build",
-    "package": "electron-builder --config electron-builder.yml --dir",
     "lint": "eslint src --ext .ts,.tsx",
     "typecheck": "tsc --noEmit"
   },

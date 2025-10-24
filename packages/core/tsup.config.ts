@@ -8,9 +8,4 @@ export default defineConfig({
   clean: true,
   target: 'es2022',
   shims: true,
-  outExtension({ format }) {
-    return {
-      js: format === 'esm' ? '.mjs' : '.cjs',
-    };
-  },
 });

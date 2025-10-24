@@ -12,7 +12,6 @@
     "build": "pnpm -r run build",
     "dev": "pnpm --filter @schemasync/desktop dev",
     "dev:desktop": "pnpm --filter @schemasync/desktop dev",
-    "package:desktop": "pnpm --filter @schemasync/desktop run package",
     "test": "pnpm -r run test",
     "lint": "eslint .",
     "format": "prettier --write .",

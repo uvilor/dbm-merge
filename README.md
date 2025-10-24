@@ -42,35 +42,6 @@ pnpm dev
 
 This launches the Electron renderer with hot reload using electron-vite.
 
-### Command line usage
-
-Build the CLI bundle and inspect available commands:
-
-```bash
-pnpm --filter @schemasync/cli run build
-pnpm --filter @schemasync/cli exec -- node dist/index.js --help
-```
-
-Once built you can run comparisons or generate scripts directly. Example comparing two
-local schemas (replace the URLs with your own):
-
-```bash
-pnpm --filter @schemasync/cli exec -- node dist/index.js compare \
-  --from "postgres://user:pass@localhost:5432/app?schema=public" \
-  --to "mariadb://user:pass@localhost:3306/app?schema=public" \
-  --schema public --format json
-```
-
-### Build a desktop executable
-
-Package the Electron application with `electron-builder`. The command builds the
-production bundles and produces unpacked artifacts under `apps/desktop/dist` (for
-example `linux-unpacked` on Linux).
-
-```bash
-pnpm package:desktop
-```
-
 ## Workspace layout
 
 ```

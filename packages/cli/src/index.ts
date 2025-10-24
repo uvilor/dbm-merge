@@ -1,6 +1,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
 
 import chalk from 'chalk';
 import { Command } from 'commander';
@@ -152,16 +151,12 @@ program
     });
   });
 
-const entryUrl = process.argv[1] ? pathToFileURL(process.argv[1]).href : undefined;
+program.parseAsync().catch((error) => {
+  process.stderr.write(chalk.red(`Unexpected error: ${error.message}`) + '\n');
+  process.exit(1);
+});
 
-if (!entryUrl || import.meta.url === entryUrl) {
-  program.parseAsync().catch((error) => {
-    process.stderr.write(chalk.red(`Unexpected error: ${error.message}`) + '\n');
-    process.exit(1);
-  });
-}
-
-export function parseConnection(value: string, defaultSchema?: string): SchemaRef {
+function parseConnection(value: string, defaultSchema?: string): SchemaRef {
   const url = new URL(value);
   const kind = url.protocol.replace(':', '');
   if (kind !== 'postgres' && kind !== 'mariadb') {
@@ -199,36 +194,24 @@ async function runWithErrors(fn: () => Promise<void>) {
   }
 }
 
-export function summarizeDiff(diff: DiffResult) {
+function summarizeDiff(diff: DiffResult) {
   return {
     tables: {
       added: diff.tables.added.length,
       removed: diff.tables.removed.length,
       changed: diff.tables.changed.length,
     },
-    views: {
-      added: diff.views.added.length,
-      removed: diff.views.removed.length,
-      changed: diff.views.changed.length,
-    },
-    routines: {
-      added: diff.routines.added.length,
-      removed: diff.routines.removed.length,
-      changed: diff.routines.changed.length,
-    },
-    triggers: {
-      added: diff.triggers.added.length,
-      removed: diff.triggers.removed.length,
-      changed: diff.triggers.changed.length,
-    },
+    views: diff.views,
+    routines: diff.routines,
+    triggers: diff.triggers,
   };
 }
 
-export function renderDiffSummary(diff: DiffResult): string {
+function renderDiffSummary(diff: DiffResult): string {
   const lines: string[] = [];
   lines.push(chalk.bold('Tables:'));
-  lines.push(`  Added: ${diff.tables.added.length}`);
-  lines.push(`  Removed: ${diff.tables.removed.length}`);
+  lines.push(`  Added: ${diff.tables.removed.length}`);
+  lines.push(`  Removed: ${diff.tables.added.length}`);
   lines.push(`  Changed: ${diff.tables.changed.length}`);
 
   diff.tables.changed.forEach((change) => {
@@ -237,20 +220,20 @@ export function renderDiffSummary(diff: DiffResult): string {
 
   lines.push('');
   lines.push(chalk.bold('Views:'));
-  lines.push(`  Added: ${diff.views.added.length}`);
-  lines.push(`  Removed: ${diff.views.removed.length}`);
+  lines.push(`  Added: ${diff.views.removed.length}`);
+  lines.push(`  Removed: ${diff.views.added.length}`);
   lines.push(`  Changed: ${diff.views.changed.length}`);
 
   lines.push('');
   lines.push(chalk.bold('Routines:'));
-  lines.push(`  Added: ${diff.routines.added.length}`);
-  lines.push(`  Removed: ${diff.routines.removed.length}`);
+  lines.push(`  Added: ${diff.routines.removed.length}`);
+  lines.push(`  Removed: ${diff.routines.added.length}`);
   lines.push(`  Changed: ${diff.routines.changed.length}`);
 
   lines.push('');
   lines.push(chalk.bold('Triggers:'));
-  lines.push(`  Added: ${diff.triggers.added.length}`);
-  lines.push(`  Removed: ${diff.triggers.removed.length}`);
+  lines.push(`  Added: ${diff.triggers.removed.length}`);
+  lines.push(`  Removed: ${diff.triggers.added.length}`);
   lines.push(`  Changed: ${diff.triggers.changed.length}`);
 
   return lines.join('\n');
