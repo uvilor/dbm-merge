@@ -1,0 +1,26 @@
+:root {
+  color-scheme: light dark;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+a {
+  color: inherit;
+}
+
+main {
+  padding: 24px;
+}
+
+button {
+  cursor: pointer;
+}
+
+input, select, textarea {
+  font: inherit;
+}
