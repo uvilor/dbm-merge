@@ -1,16 +1,9 @@
 import { dialog, ipcMain } from 'electron';
 import { writeFile } from 'node:fs/promises';
 
-import {
-  buildReviewPrompt,
-  computeDiff,
-  loadMariaDB,
-  loadPostgres,
-  normalizeSchemaModel,
-  toMariaDB,
-  toPostgres,
-  type DiffResult,
-  type SchemaModel,
+import type {
+  DiffResult,
+  SchemaModel,
 } from '@schemasync/core';
 
 import { connectionToSchemaRef, keyStore, type ConnectionConfig, type PreferenceConfig } from './store';
@@ -25,6 +18,28 @@ interface GeneratePayload {
   targetDialect: 'postgres' | 'mariadb';
   options: PreferenceConfig & { direction: 'AtoB' | 'BtoA'; ifExists: boolean };
 }
+
+type CoreModule = typeof import('@schemasync/core');
+
+let coreModulePromise: Promise<CoreModule> | undefined;
+
+function loadCoreModule(): Promise<CoreModule> {
+  if (!coreModulePromise) {
+    coreModulePromise = import('@schemasync/core').catch(async (error: unknown) => {
+      const nodeError = error as NodeJS.ErrnoException;
+      const message = error instanceof Error ? error.message : '';
+      const isMissingModule = nodeError?.code === 'ERR_MODULE_NOT_FOUND' || message.includes('Cannot find module');
+      if (!isMissingModule) {
+        throw error;
+      }
+      const coreSourceUrl = new URL('../../../../packages/core/src/index.ts', import.meta.url);
+      return import(coreSourceUrl.href) as Promise<CoreModule>;
+    });
+  }
+  return coreModulePromise;
+}
+
+const corePromise = loadCoreModule();
 
 export function registerIpcHandlers() {
   ipcMain.handle('schemasync:list-connections', () => {
@@ -65,6 +80,7 @@ export function registerIpcHandlers() {
   });
 
   ipcMain.handle('schemasync:generate', async (_event, payload: GeneratePayload) => {
+    const { toMariaDB, toPostgres } = await corePromise;
     const diff = await loadDiff(payload.connections.source, payload.connections.target);
     const sql = payload.targetDialect === 'mariadb'
       ? toMariaDB(diff, payload.options)
@@ -73,6 +89,7 @@ export function registerIpcHandlers() {
   });
 
   ipcMain.handle('schemasync:prompt', async (_event, payload: GeneratePayload) => {
+    const { buildReviewPrompt, toMariaDB, toPostgres } = await corePromise;
     const diff = await loadDiff(payload.connections.source, payload.connections.target);
     const sql = payload.targetDialect === 'mariadb'
       ? toMariaDB(diff, payload.options)
@@ -90,6 +107,7 @@ export function registerIpcHandlers() {
 }
 
 async function loadDiff(sourceConn: ConnectionConfig, targetConn: ConnectionConfig): Promise<DiffResult> {
+  const { computeDiff, normalizeSchemaModel } = await corePromise;
   const [source, target] = await Promise.all([
     loadSchema(sourceConn),
     loadSchema(targetConn),
@@ -106,6 +124,7 @@ async function loadDiff(sourceConn: ConnectionConfig, targetConn: ConnectionConf
 }
 
 async function loadSchema(config: ConnectionConfig): Promise<SchemaModel> {
+  const { loadPostgres, loadMariaDB } = await corePromise;
   const ref = connectionToSchemaRef(config);
   return config.kind === 'postgres' ? loadPostgres(ref) : loadMariaDB(ref);
 }

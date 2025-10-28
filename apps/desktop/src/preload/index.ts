@@ -37,11 +37,21 @@ const api: IpcAPI = {
 };
 
 console.log('Exposing schemasync API...');
-contextBridge.exposeInMainWorld('schemasync', api);
-console.log('schemasync API exposed successfully');
+if (process.contextIsolated) {
+  contextBridge.exposeInMainWorld('schemasync', api);
+  console.log('schemasync API exposed successfully via contextBridge');
+  try {
+    Reflect.set(window, 'schemasync', api);
+  } catch (error) {
+    console.warn('Unable to mirror schemasync API on window object', error);
+  }
+} else {
+  Reflect.set(window, 'schemasync', api);
+  console.log('schemasync API assigned directly to window');
+}
 
 declare global {
   interface Window {
-    schemasync: IpcAPI;
+    schemasync?: IpcAPI;
   }
 }
